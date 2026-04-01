@@ -173,6 +173,17 @@ main{padding:20px 28px 48px}
 .live-btn.active .live-dot{animation:blink 1s ease-in-out infinite}
 @keyframes blink{0%,100%{opacity:1}50%{opacity:.3}}
 
+
+.progress-wrap{margin-top:10px}
+.progress-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:5px}
+.progress-label{font-size:10px;color:var(--muted);font-family:'DM Mono',monospace}
+.progress-count{font-size:10px;font-family:'DM Mono',monospace;color:var(--text);font-weight:600}
+.progress-bar-bg{height:5px;background:var(--border);border-radius:3px;overflow:hidden}
+.progress-bar-fill{height:100%;border-radius:3px;transition:width .5s ease;background:linear-gradient(90deg,#16a34a,#22c55e)}
+.progress-bar-fill.almost{background:linear-gradient(90deg,#d97706,#f59e0b)}
+.progress-bar-fill.done{background:linear-gradient(90deg,#2563eb,#3b82f6)}
+.progress-daily{font-size:10px;color:var(--muted);font-family:'DM Mono',monospace;margin-top:4px}
+
 </style>
 </head>
 <body>
@@ -485,6 +496,7 @@ function renderCard(id,d,url,fallback){
         <svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M7 1h4v4M11 1L6.5 5.5M5 2H2a1 1 0 00-1 1v7a1 1 0 001 1h7a1 1 0 001-1V8"/></svg>
         Voir sur Maps
       </a>
+      ${renderProgress(d.reviews||0)}
     </div>
   `;
 }
@@ -503,6 +515,33 @@ function renderCardErr(id,name,msg,url){
       </a>
     </div>
   `;
+}
+
+
+function renderProgress(reviews) {
+  const GOAL = 30;
+  const pct = Math.min(Math.round((reviews / GOAL) * 100), 100);
+  const remaining = Math.max(GOAL - reviews, 0);
+  const daysLeft = remaining > 0 ? Math.ceil(remaining / 5) : 0;
+  
+  let fillClass = 'progress-bar-fill';
+  if (pct >= 100) fillClass += ' done';
+  else if (pct >= 70) fillClass += ' almost';
+  
+  const dailyText = pct >= 100 
+    ? '✓ Objectif atteint !' 
+    : `~${daysLeft}j restants à 5 avis/jour`;
+  
+  return \`<div class="progress-wrap">
+    <div class="progress-header">
+      <span class="progress-label">Objectif 30 avis</span>
+      <span class="progress-count">\${reviews}/30 · \${pct}%</span>
+    </div>
+    <div class="progress-bar-bg">
+      <div class="\${fillClass}" style="width:\${pct}%"></div>
+    </div>
+    <div class="progress-daily">\${dailyText}</div>
+  </div>\`;
 }
 
 function updateStats(){
