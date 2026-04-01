@@ -165,6 +165,14 @@ main{padding:20px 28px 48px}
 .alert-name{font-weight:600;color:var(--text)}
 .alert-desc{font-size:11px;color:var(--muted);font-family:'DM Mono',monospace;margin-top:2px}
 
+
+.live-btn{display:inline-flex;align-items:center;gap:6px;background:transparent;border:1px solid var(--border);color:var(--muted);padding:9px 14px;border-radius:var(--radius-sm);font-size:13px;cursor:pointer;transition:all .15s;font-family:'DM Sans',sans-serif;font-weight:500}
+.live-btn:hover{border-color:#16a34a;color:#16a34a}
+.live-btn.active{background:#16a34a;border-color:#16a34a;color:#fff}
+.live-dot{width:7px;height:7px;border-radius:50%;background:currentColor}
+.live-btn.active .live-dot{animation:blink 1s ease-in-out infinite}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:.3}}
+
 </style>
 </head>
 <body>
@@ -179,6 +187,7 @@ main{padding:20px 28px 48px}
   </div>
   <div class="header-right">
     <button class="refresh-btn" onclick="refreshAll()">↺ Actualiser</button>
+    <button class="live-btn" id="live-btn" onclick="toggleLive()"><span class="live-dot"></span><span id="live-label">Live</span></button>
   </div>
 </header>
 
@@ -935,6 +944,45 @@ function switchTab(t) {
     buildFicheSelector();
     renderAnalyse();
     checkAlerts();
+  }
+}
+
+
+// ===== LIVE MODE =====
+let liveInterval = null;
+let liveCountdown = null;
+let liveSeconds = 300;
+
+function toggleLive() {
+  const btn = document.getElementById('live-btn');
+  const label = document.getElementById('live-label');
+  
+  if (liveInterval) {
+    // Stop live
+    clearInterval(liveInterval);
+    clearInterval(liveCountdown);
+    liveInterval = null;
+    liveCountdown = null;
+    btn.classList.remove('active');
+    label.textContent = 'Live';
+  } else {
+    // Start live
+    btn.classList.add('active');
+    liveSeconds = 300;
+    label.textContent = '5:00';
+    
+    liveCountdown = setInterval(() => {
+      liveSeconds--;
+      const m = Math.floor(liveSeconds / 60);
+      const s = liveSeconds % 60;
+      label.textContent = `${m}:${s.toString().padStart(2,'0')}`;
+      if (liveSeconds <= 0) {
+        liveSeconds = 300;
+        refreshAll();
+      }
+    }, 1000);
+    
+    liveInterval = setInterval(() => {}, 300000); // keep alive marker
   }
 }
 
