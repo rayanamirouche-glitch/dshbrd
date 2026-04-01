@@ -308,7 +308,7 @@ function buildSkeleton(){
         <span class="section-zone">${c.zone}</span>
       </div>
       <div class="grid" id="grid-${c.name}">
-        ${c.fiches.map(f=>`<div class="card" id="card-${cid(f.id)}"><div class="card-loading"><div class="spinner"></div>Chargement…</div></div>`).join('')}
+        ${c.fiches.map((f,fi)=>`<div class="card" id="card-${c.name.replace(/[^a-z0-9]/gi,'_')}_${fi}"><div class="card-loading"><div class="spinner"></div>Chargement…</div></div>`).join('')}
       </div>
     `;
     m.appendChild(sec);
@@ -329,17 +329,18 @@ async function loadAll(){
   const fill=document.getElementById('progress-fill');
   bar.classList.add('active');
   fill.style.width='0%';
-  const all=CLIENTS.flatMap(c=>c.fiches);
+  const all=CLIENTS.flatMap(c=>c.fiches.map((f,fi)=>({...f,client:c.name,fi})));
   let done=0,qi=0;
   async function worker(){
     while(qi<all.length){
       const f=all[qi++];
+      const cardId=`card-${f.client.replace(/[^a-z0-9]/gi,'_')}_${f.fi}`;
       try{
         const data=await fetchFiche(f.id);
         results[f.id]={...data,mapUrl:f.url,name:f.n};
-        renderCard(f.id,data,f.url,f.n);
+        renderCard(cardId,data,f.url,f.n);
       }catch(e){
-        renderCardErr(f.id,f.n,e.message,f.url);
+        renderCardErr(cardId,f.n,e.message,f.url);
       }
       done++;
       fill.style.width=Math.round(done/all.length*100)+'%';
@@ -360,7 +361,7 @@ async function fetchFiche(place_id){
 }
 
 function renderCard(id,d,url,fallback){
-  const card=document.getElementById(cid(id));
+  const card=document.getElementById(id);
   if(!card) return;
   card.innerHTML=`
     ${d.photo_url
@@ -387,7 +388,7 @@ function renderCard(id,d,url,fallback){
 }
 
 function renderCardErr(id,name,msg,url){
-  const card=document.getElementById(cid(id));
+  const card=document.getElementById(id);
   if(!card) return;
   card.innerHTML=`
     <div class="card-img-empty"><span>Erreur</span></div>
@@ -512,9 +513,12 @@ function renderProgression(){
   });
 }
 
-window.addEventListener('DOMContentLoaded',()=>{
+// Auto-init
+if(document.readyState==='loading'){
+  document.addEventListener('DOMContentLoaded',initDashboard);
+}else{
   initDashboard();
-});
+}
 </script>
 </body>
 </html>
