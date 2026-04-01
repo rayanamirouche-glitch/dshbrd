@@ -5,18 +5,12 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 <title>R.Consulting — Dashboard GBP</title>
 <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet"/>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
 :root{
-  --bg:#f6f5f2;
-  --white:#ffffff;
-  --surface:#fafaf8;
-  --border:#e8e5df;
-  --text:#1a1916;
-  --muted:#9b9489;
-  --accent:#2d6a4f;
-  --radius:14px;
-  --radius-sm:8px;
+  --bg:#f6f5f2;--white:#ffffff;--surface:#fafaf8;--border:#e8e5df;
+  --text:#1a1916;--muted:#9b9489;--radius:14px;--radius-sm:8px;
   --shadow:0 1px 3px rgba(0,0,0,.06),0 1px 2px rgba(0,0,0,.04);
   --shadow-md:0 4px 16px rgba(0,0,0,.08),0 1px 4px rgba(0,0,0,.04);
 }
@@ -29,7 +23,7 @@ header{background:var(--white);border-bottom:1px solid var(--border);padding:0 2
 .brand-name{font-size:15px;font-weight:600;letter-spacing:-.3px}
 .brand-tag{font-size:12px;color:var(--muted);font-family:'DM Mono',monospace}
 .header-right{display:flex;align-items:center;gap:10px}
-#api-input{background:var(--surface);border:1px solid var(--border);color:var(--text);font-family:'DM Mono',monospace;font-size:12px;padding:9px 14px;border-radius:var(--radius-sm);width:280px;outline:none;transition:border-color .15s}
+#api-input{background:var(--surface);border:1px solid var(--border);color:var(--text);font-family:'DM Mono',monospace;font-size:12px;padding:9px 14px;border-radius:var(--radius-sm);width:260px;outline:none;transition:border-color .15s}
 #api-input::placeholder{color:var(--muted)}
 #api-input:focus{border-color:var(--text)}
 #api-btn{background:var(--text);color:var(--white);border:none;padding:9px 18px;font-family:'DM Sans',sans-serif;font-weight:500;font-size:13px;border-radius:var(--radius-sm);cursor:pointer;transition:opacity .15s}
@@ -44,20 +38,50 @@ header{background:var(--white);border-bottom:1px solid var(--border);padding:0 2
 .stat-val.green{color:#16a34a}
 .stat-val.red{color:#dc2626}
 .stat-val.amber{color:#d97706}
+.stat-delta{font-size:11px;margin-top:3px;font-family:'DM Mono',monospace}
+.stat-delta.up{color:#16a34a}
+.stat-delta.down{color:#dc2626}
+.stat-delta.neutral{color:var(--muted)}
 
 #progress-bar-wrap{height:3px;background:var(--border);margin:0 28px;border-radius:3px;overflow:hidden;display:none}
 #progress-bar-wrap.active{display:block}
 #progress-fill{height:100%;background:var(--text);border-radius:3px;width:0%;transition:width .3s ease}
 
+/* TABS */
+.tabs{display:flex;gap:4px;padding:20px 28px 0;border-bottom:1px solid var(--border);background:var(--white)}
+.tab{padding:10px 18px;font-size:13px;font-weight:500;color:var(--muted);cursor:pointer;border-bottom:2px solid transparent;transition:all .15s;background:none;border-top:none;border-left:none;border-right:none;font-family:'DM Sans',sans-serif}
+.tab:hover{color:var(--text)}
+.tab.active{color:var(--text);border-bottom-color:var(--text)}
+
 main{padding:20px 28px 48px}
+
+/* PROGRESSION SECTION */
+.prog-section{margin-bottom:32px}
+.prog-header{font-size:17px;font-weight:600;letter-spacing:-.3px;margin-bottom:16px}
+
+.chart-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:24px}
+.chart-card{background:var(--white);border:1px solid var(--border);border-radius:var(--radius);padding:20px;box-shadow:var(--shadow)}
+.chart-title{font-size:13px;font-weight:600;color:var(--text);margin-bottom:4px}
+.chart-sub{font-size:11px;color:var(--muted);font-family:'DM Mono',monospace;margin-bottom:16px}
+.chart-wrap{position:relative;height:180px}
+
+.snapshot-table{background:var(--white);border:1px solid var(--border);border-radius:var(--radius);overflow:hidden;box-shadow:var(--shadow)}
+.snapshot-table table{width:100%;border-collapse:collapse;font-size:13px}
+.snapshot-table th{padding:12px 16px;text-align:left;font-size:11px;font-weight:500;color:var(--muted);letter-spacing:.3px;text-transform:uppercase;border-bottom:1px solid var(--border);background:var(--surface)}
+.snapshot-table td{padding:12px 16px;border-bottom:1px solid var(--border);font-family:'DM Mono',monospace;font-size:12px}
+.snapshot-table tr:last-child td{border-bottom:none}
+.snapshot-table tr:hover td{background:var(--surface)}
+.delta-up{color:#16a34a;font-weight:500}
+.delta-down{color:#dc2626;font-weight:500}
+.delta-neu{color:var(--muted)}
+
+/* FICHES */
 .section{margin-bottom:36px}
 .section-header{display:flex;align-items:baseline;gap:10px;margin-bottom:14px}
 .section-name{font-size:17px;font-weight:600;letter-spacing:-.3px}
 .section-count{font-size:12px;color:var(--muted);font-family:'DM Mono',monospace}
 .section-zone{font-size:12px;color:var(--muted);margin-left:auto;font-style:italic}
-
 .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:14px}
-
 .card{background:var(--white);border:1px solid var(--border);border-radius:var(--radius);overflow:hidden;box-shadow:var(--shadow);transition:box-shadow .2s,transform .2s}
 .card:hover{box-shadow:var(--shadow-md);transform:translateY(-2px)}
 .card-img{width:100%;height:130px;object-fit:cover;background:var(--surface);display:block}
@@ -87,6 +111,9 @@ main{padding:20px 28px 48px}
 .empty-state{text-align:center;padding:60px 20px;color:var(--muted)}
 .empty-state p{font-size:14px;line-height:1.6}
 .empty-state .big{font-size:36px;margin-bottom:12px}
+.tab-content{display:none}
+.tab-content.active{display:block}
+.no-data{text-align:center;padding:40px;color:var(--muted);font-size:13px;font-family:'DM Mono',monospace}
 </style>
 </head>
 <body>
@@ -110,16 +137,58 @@ main{padding:20px 28px 48px}
   <div class="stat-card"><div class="stat-label">Fiches</div><div class="stat-val" id="s-total">—</div></div>
   <div class="stat-card"><div class="stat-label">Actives</div><div class="stat-val green" id="s-ok">—</div></div>
   <div class="stat-card"><div class="stat-label">Problèmes</div><div class="stat-val red" id="s-err">—</div></div>
-  <div class="stat-card"><div class="stat-label">Note moy.</div><div class="stat-val amber" id="s-rating">—</div></div>
-  <div class="stat-card"><div class="stat-label">Avis totaux</div><div class="stat-val" id="s-reviews">—</div></div>
+  <div class="stat-card"><div class="stat-label">Note moy.</div><div class="stat-val amber" id="s-rating">—</div><div class="stat-delta neutral" id="d-rating"></div></div>
+  <div class="stat-card"><div class="stat-label">Avis totaux</div><div class="stat-val" id="s-reviews">—</div><div class="stat-delta neutral" id="d-reviews"></div></div>
 </div>
 
 <div id="progress-bar-wrap"><div id="progress-fill"></div></div>
 
-<main id="main">
-  <div class="empty-state">
-    <div class="big">🔑</div>
-    <p>Entre ta clé API Google Places<br>et clique <strong>Valider</strong> pour charger les fiches.</p>
+<div class="tabs">
+  <button class="tab active" onclick="switchTab('fiches')">Fiches GBP</button>
+  <button class="tab" onclick="switchTab('progression')">Progression</button>
+</div>
+
+<main>
+  <div id="tab-fiches" class="tab-content active">
+    <div id="main-fiches" style="margin-top:20px">
+      <div class="empty-state">
+        <div class="big">🔑</div>
+        <p>Entre ta clé API Google Places<br>et clique <strong>Valider</strong> pour charger les fiches.</p>
+      </div>
+    </div>
+  </div>
+
+  <div id="tab-progression" class="tab-content">
+    <div style="margin-top:20px">
+      <div class="chart-grid">
+        <div class="chart-card">
+          <div class="chart-title">Évolution des avis</div>
+          <div class="chart-sub">Total avis par jour</div>
+          <div class="chart-wrap"><canvas id="chart-reviews"></canvas></div>
+        </div>
+        <div class="chart-card">
+          <div class="chart-title">Note moyenne</div>
+          <div class="chart-sub">Évolution de la note globale</div>
+          <div class="chart-wrap"><canvas id="chart-rating"></canvas></div>
+        </div>
+      </div>
+      <div class="snapshot-table">
+        <table>
+          <thead>
+            <tr>
+              <th>Date</th>
+              <th>Avis totaux</th>
+              <th>Évolution</th>
+              <th>Note moy.</th>
+              <th>Actives</th>
+            </tr>
+          </thead>
+          <tbody id="snapshot-tbody">
+            <tr><td colspan="5" class="no-data">Aucune donnée encore — charge les fiches d'abord</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
   </div>
 </main>
 
@@ -186,6 +255,16 @@ const CLIENTS=[
 
 let apiKey=localStorage.getItem('rc_key')||'';
 let results={};
+let snapshots={};
+let charts={};
+
+function switchTab(t){
+  document.querySelectorAll('.tab').forEach(el=>el.classList.remove('active'));
+  document.querySelectorAll('.tab-content').forEach(el=>el.classList.remove('active'));
+  document.getElementById('tab-'+t).classList.add('active');
+  event.target.classList.add('active');
+  if(t==='progression') renderProgression();
+}
 
 function statusBadge(s){
   if(s==='OPERATIONAL') return '<span class="badge op">Actif</span>';
@@ -196,7 +275,7 @@ function statusBadge(s){
 }
 
 function renderStars(r){
-  if(!r) return '<span style="font-size:11px;color:var(--muted);font-family:\'DM Mono\',monospace">—</span>';
+  if(!r) return '<span style="font-size:11px;color:var(--muted)">—</span>';
   let s='';
   for(let i=1;i<=5;i++) s+=`<span class="${i<=Math.round(r)?'star-filled':'star-empty'}">★</span>`;
   return s;
@@ -208,7 +287,7 @@ function initDashboard(){
   if(!apiKey){alert('Entre ta clé API !');return;}
   results={};
   buildSkeleton();
-  loadAll();
+  loadSnapshots().then(()=>loadAll());
 }
 
 function refreshAll(){
@@ -219,7 +298,7 @@ function refreshAll(){
 }
 
 function buildSkeleton(){
-  const m=document.getElementById('main');
+  const m=document.getElementById('main-fiches');
   m.innerHTML='';
   const total=CLIENTS.reduce((s,c)=>s+c.fiches.length,0);
   document.getElementById('s-total').textContent=total;
@@ -234,14 +313,21 @@ function buildSkeleton(){
         <span class="section-zone">${c.zone}</span>
       </div>
       <div class="grid" id="grid-${c.name}">
-        ${c.fiches.map(f=>`<div class="card" id="card-${f.id.replace(/[^a-z0-9]/gi,'_')}"><div class="card-loading"><div class="spinner"></div>Chargement…</div></div>`).join('')}
+        ${c.fiches.map(f=>`<div class="card" id="card-${cid(f.id)}"><div class="card-loading"><div class="spinner"></div>Chargement…</div></div>`).join('')}
       </div>
     `;
     m.appendChild(sec);
   });
 }
 
-function cardId(id){return'card-'+id.replace(/[^a-z0-9]/gi,'_');}
+function cid(id){return'c'+id.replace(/[^a-z0-9]/gi,'_');}
+
+async function loadSnapshots(){
+  try{
+    const r=await fetch('/.netlify/functions/snapshot');
+    snapshots=await r.json();
+  }catch(e){snapshots={};}
+}
 
 async function loadAll(){
   const bar=document.getElementById('progress-bar-wrap');
@@ -255,7 +341,7 @@ async function loadAll(){
       const f=all[qi++];
       try{
         const data=await fetchFiche(f.id);
-        results[f.id]={...data,mapUrl:f.url};
+        results[f.id]={...data,mapUrl:f.url,name:f.n};
         renderCard(f.id,data,f.url,f.n);
       }catch(e){
         renderCardErr(f.id,f.n,e.message,f.url);
@@ -267,6 +353,7 @@ async function loadAll(){
   await Promise.all([worker(),worker(),worker()]);
   setTimeout(()=>{bar.classList.remove('active');fill.style.width='0%';},600);
   updateStats();
+  saveSnapshot();
 }
 
 async function fetchFiche(place_id){
@@ -278,7 +365,7 @@ async function fetchFiche(place_id){
 }
 
 function renderCard(id,d,url,fallback){
-  const card=document.getElementById(cardId(id));
+  const card=document.getElementById(cid(id));
   if(!card) return;
   card.innerHTML=`
     ${d.photo_url
@@ -305,7 +392,7 @@ function renderCard(id,d,url,fallback){
 }
 
 function renderCardErr(id,name,msg,url){
-  const card=document.getElementById(cardId(id));
+  const card=document.getElementById(cid(id));
   if(!card) return;
   card.innerHTML=`
     <div class="card-img-empty"><span>Erreur</span></div>
@@ -331,6 +418,103 @@ function updateStats(){
   document.getElementById('s-err').textContent=err||'—';
   document.getElementById('s-rating').textContent=avg;
   document.getElementById('s-reviews').textContent=rev||'—';
+
+  // Deltas vs hier
+  const dates=Object.keys(snapshots).sort();
+  if(dates.length>=1){
+    const prev=snapshots[dates[dates.length-1]];
+    if(prev){
+      const dRev=rev-(prev.reviews||0);
+      const dRating=avg!=='—'&&prev.rating?((parseFloat(avg)-parseFloat(prev.rating)).toFixed(2)):null;
+      const elRev=document.getElementById('d-reviews');
+      const elRat=document.getElementById('d-rating');
+      if(dRev>0){elRev.textContent=`+${dRev} vs hier`;elRev.className='stat-delta up';}
+      else if(dRev<0){elRev.textContent=`${dRev} vs hier`;elRev.className='stat-delta down';}
+      else{elRev.textContent=`= vs hier`;elRev.className='stat-delta neutral';}
+      if(dRating){
+        if(dRating>0){elRat.textContent=`+${dRating} vs hier`;elRat.className='stat-delta up';}
+        else if(dRating<0){elRat.textContent=`${dRating} vs hier`;elRat.className='stat-delta down';}
+        else{elRat.textContent=`= vs hier`;elRat.className='stat-delta neutral';}
+      }
+    }
+  }
+}
+
+async function saveSnapshot(){
+  const vals=Object.values(results);
+  const rated=vals.filter(r=>r.rating);
+  const avg=rated.length?(rated.reduce((s,r)=>s+r.rating,0)/rated.length).toFixed(2):null;
+  const rev=vals.reduce((s,r)=>s+(r.reviews||0),0);
+  const ok=vals.filter(r=>r.status==='OPERATIONAL').length;
+  const payload={reviews:rev,rating:avg,active:ok,total:vals.length};
+  try{
+    await fetch('/.netlify/functions/snapshot',{
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify(payload)
+    });
+    await loadSnapshots();
+  }catch(e){}
+}
+
+function renderProgression(){
+  const dates=Object.keys(snapshots).sort().slice(-30);
+  if(!dates.length){
+    document.getElementById('snapshot-tbody').innerHTML='<tr><td colspan="5" class="no-data">Aucune donnée encore</td></tr>';
+    return;
+  }
+
+  // Table
+  const tbody=document.getElementById('snapshot-tbody');
+  tbody.innerHTML='';
+  [...dates].reverse().forEach((date,i)=>{
+    const s=snapshots[date];
+    const prevDate=dates[dates.length-1-i-1];
+    const prev=prevDate?snapshots[prevDate]:null;
+    const delta=prev?(s.reviews-prev.reviews):null;
+    let deltaHtml='<span class="delta-neu">—</span>';
+    if(delta!==null){
+      if(delta>0) deltaHtml=`<span class="delta-up">+${delta} avis</span>`;
+      else if(delta<0) deltaHtml=`<span class="delta-down">${delta} avis</span>`;
+      else deltaHtml=`<span class="delta-neu">= 0</span>`;
+    }
+    tbody.innerHTML+=`<tr>
+      <td>${date}</td>
+      <td>${s.reviews||'—'}</td>
+      <td>${deltaHtml}</td>
+      <td>${s.rating||'—'}</td>
+      <td>${s.active||'—'} / ${s.total||'—'}</td>
+    </tr>`;
+  });
+
+  // Charts
+  const labels=dates.map(d=>d.slice(5));
+  const reviewsData=dates.map(d=>snapshots[d].reviews||0);
+  const ratingData=dates.map(d=>parseFloat(snapshots[d].rating)||null);
+
+  if(charts.reviews) charts.reviews.destroy();
+  if(charts.rating) charts.rating.destroy();
+
+  const baseOpts={
+    responsive:true,maintainAspectRatio:false,
+    plugins:{legend:{display:false}},
+    scales:{
+      x:{grid:{display:false},ticks:{font:{family:'DM Mono',size:10},color:'#9b9489'}},
+      y:{grid:{color:'#e8e5df'},ticks:{font:{family:'DM Mono',size:10},color:'#9b9489'}}
+    }
+  };
+
+  charts.reviews=new Chart(document.getElementById('chart-reviews'),{
+    type:'line',
+    data:{labels,datasets:[{data:reviewsData,borderColor:'#1a1916',backgroundColor:'rgba(26,25,22,.06)',borderWidth:2,pointRadius:3,pointBackgroundColor:'#1a1916',fill:true,tension:.3}]},
+    options:{...baseOpts}
+  });
+
+  charts.rating=new Chart(document.getElementById('chart-rating'),{
+    type:'line',
+    data:{labels,datasets:[{data:ratingData,borderColor:'#d97706',backgroundColor:'rgba(217,119,6,.06)',borderWidth:2,pointRadius:3,pointBackgroundColor:'#d97706',fill:true,tension:.3}]},
+    options:{...baseOpts,scales:{...baseOpts.scales,y:{...baseOpts.scales.y,min:1,max:5}}}
+  });
 }
 
 window.addEventListener('DOMContentLoaded',()=>{
