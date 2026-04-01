@@ -127,9 +127,7 @@ main{padding:20px 28px 48px}
     </div>
   </div>
   <div class="header-right">
-    <input id="api-input" type="password" placeholder="Clé API Google Places…" autocomplete="off"/>
-    <button id="api-btn" onclick="initDashboard()">Valider</button>
-    <button class="refresh-btn" onclick="refreshAll()">↺</button>
+    <button class="refresh-btn" onclick="refreshAll()">↺ Actualiser</button>
   </div>
 </header>
 
@@ -151,10 +149,7 @@ main{padding:20px 28px 48px}
 <main>
   <div id="tab-fiches" class="tab-content active">
     <div id="main-fiches" style="margin-top:20px">
-      <div class="empty-state">
-        <div class="big">🔑</div>
-        <p>Entre ta clé API Google Places<br>et clique <strong>Valider</strong> pour charger les fiches.</p>
-      </div>
+
     </div>
   </div>
 
@@ -285,9 +280,6 @@ function renderStars(r){
 }
 
 function initDashboard(){
-  const v=document.getElementById('api-input').value.trim();
-  if(v){apiKey=v;localStorage.setItem('rc_key',v);}
-  if(!apiKey){alert('Entre ta clé API !');return;}
   results={};
   buildSkeleton();
   loadSnapshots().then(()=>loadAll());
@@ -521,7 +513,7 @@ function renderProgression(){
 }
 
 window.addEventListener('DOMContentLoaded',()=>{
-  if(apiKey){document.getElementById('api-input').value=apiKey;initDashboard();}
+  initDashboard();
 });
 </script>
 </body>
