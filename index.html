@@ -519,29 +519,24 @@ function renderCardErr(id,name,msg,url){
 
 
 function renderProgress(reviews) {
-  const GOAL = 30;
-  const pct = Math.min(Math.round((reviews / GOAL) * 100), 100);
-  const remaining = Math.max(GOAL - reviews, 0);
-  const daysLeft = remaining > 0 ? Math.ceil(remaining / 5) : 0;
-  
-  let fillClass = 'progress-bar-fill';
+  var GOAL = 30;
+  var pct = Math.min(Math.round((reviews / GOAL) * 100), 100);
+  var remaining = Math.max(GOAL - reviews, 0);
+  var daysLeft = remaining > 0 ? Math.ceil(remaining / 5) : 0;
+  var fillClass = 'progress-bar-fill';
   if (pct >= 100) fillClass += ' done';
   else if (pct >= 70) fillClass += ' almost';
-  
-  const dailyText = pct >= 100 
-    ? '✓ Objectif atteint !' 
-    : `~${daysLeft}j restants à 5 avis/jour`;
-  
-  return \`<div class="progress-wrap">
-    <div class="progress-header">
-      <span class="progress-label">Objectif 30 avis</span>
-      <span class="progress-count">\${reviews}/30 · \${pct}%</span>
-    </div>
-    <div class="progress-bar-bg">
-      <div class="\${fillClass}" style="width:\${pct}%"></div>
-    </div>
-    <div class="progress-daily">\${dailyText}</div>
-  </div>\`;
+  var dailyText = pct >= 100 ? '✓ Objectif atteint !' : '~' + daysLeft + 'j restants à 5 avis/jour';
+  return '<div class="progress-wrap">' +
+    '<div class="progress-header">' +
+    '<span class="progress-label">Objectif 30 avis</span>' +
+    '<span class="progress-count">' + reviews + '/30 · ' + pct + '%</span>' +
+    '</div>' +
+    '<div class="progress-bar-bg">' +
+    '<div class="' + fillClass + '" style="width:' + pct + '%"></div>' +
+    '</div>' +
+    '<div class="progress-daily">' + dailyText + '</div>' +
+    '</div>';
 }
 
 function updateStats(){
