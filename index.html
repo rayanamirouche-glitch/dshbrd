@@ -184,6 +184,12 @@ main{padding:20px 28px 48px}
 .progress-bar-fill.done{background:linear-gradient(90deg,#2563eb,#3b82f6)}
 .progress-daily{font-size:10px;color:var(--muted);font-family:'DM Mono',monospace;margin-top:4px}
 
+
+.rank-badge{display:inline-flex;align-items:center;gap:4px;background:#f0f9ff;border:1px solid #bae6fd;color:#0369a1;font-size:10px;font-family:'DM Mono',monospace;font-weight:600;padding:3px 8px;border-radius:5px;margin-top:6px}
+.rank-badge.rank-top3{background:#f0fdf4;border-color:#bbf7d0;color:#15803d}
+.rank-badge.rank-loading{background:var(--surface);border-color:var(--border);color:var(--muted)}
+.rank-badge.rank-err{background:#fef2f2;border-color:#fecaca;color:#dc2626}
+
 </style>
 </head>
 <body>
@@ -303,68 +309,69 @@ main{padding:20px 28px 48px}
 <script>
 const CLIENTS=[
   {name:"Aaron",zone:"Ain + Corse",fiches:[
-    {n:"Oyonnax Couvreur Pro",id:"0x478cbd9d7ba2f77f:0x5754151227694f69",url:"https://www.google.com/maps/place/Oyonnax+couvreur+pro/@46.2652282,5.6600661,15z"},
-    {n:"Elite Pro Couvreur",id:"0x478b55f2e51c4491:0x9b8c61c162df5e6a",url:"https://www.google.com/maps/place/Elite+pro+couvreur/@46.0451355,5.3406085,15z"},
-    {n:"Couvreur Porto Vecchio",id:"0x12d983ff913c90d9:0xa7ae3496466b87bf",url:"https://www.google.com/maps/place/Couvreur+porto+vecchio/@41.5889706,9.2793163,15z"},
-    {n:"Couvreur Ajaccio Solid Toiture",id:"0x12da6b437e015a7d:0x86fe4382b9905bd4",url:"https://www.google.com/maps/place/Couvreur+ajaccion+solid+toiture/@41.9531629,8.7659519,15z"},
-    {n:"Expert Couvreur Bourg en Bresse",id:"0x47f35365e19c4431:0xcf7ac7bbcae1cf84",url:"https://www.google.com/maps/place/Expert+couvreur+bourg+en+bresse/@46.1980376,5.2177124,15z"},
-    {n:"Bastia Expert Couvreur",id:"0x12d725928ad3f013:0x2e9c48dd73363314",url:"https://www.google.com/maps/place/Bastia+expert+couvreur/@42.669823,9.4386398,15z"},
+    {n:"Oyonnax Couvreur Pro",id:"0x478cbd9d7ba2f77f:0x5754151227694f69",lat:46.265,lng:5.660,kw:"couvreur Oyonnax",url:"https://www.google.com/maps/place/Oyonnax+couvreur+pro/@46.2652282,5.6600661,15z",lat:46.2652,lng:5.6601,kw:"couvreur Oyonnax"},
+    {n:"Elite Pro Couvreur",id:"0x478b55f2e51c4491:0x9b8c61c162df5e6a",lat:46.045,lng:5.341,kw:"couvreur Pont-d'Ain",url:"https://www.google.com/maps/place/Elite+pro+couvreur/@46.0451355,5.3406085,15z"},
+    {n:"Couvreur Porto Vecchio",id:"0x12d983ff913c90d9:0xa7ae3496466b87bf",lat:41.589,lng:9.279,kw:"couvreur Porto-Vecchio",url:"https://www.google.com/maps/place/Couvreur+porto+vecchio/@41.5889706,9.2793163,15z"},
+    {n:"Couvreur Ajaccio Solid Toiture",id:"0x12da6b437e015a7d:0x86fe4382b9905bd4",lat:41.953,lng:8.766,kw:"couvreur Ajaccio",url:"https://www.google.com/maps/place/Couvreur+ajaccion+solid+toiture/@41.9531629,8.7659519,15z"},
+    {n:"Expert Couvreur Bourg en Bresse",id:"0x47f35365e19c4431:0xcf7ac7bbcae1cf84",lat:46.198,lng:5.218,kw:"couvreur Bourg-en-Bresse",url:"https://www.google.com/maps/place/Expert+couvreur+bourg+en+bresse/@46.1980376,5.2177124,15z"},
+    {n:"Bastia Expert Couvreur",id:"0x12d725928ad3f013:0x2e9c48dd73363314",lat:42.670,lng:9.439,kw:"couvreur Bastia",url:"https://www.google.com/maps/place/Bastia+expert+couvreur/@42.669823,9.4386398,15z"},
   ]},
   {name:"Lionel",zone:"Alpes-Maritimes",fiches:[
-    {n:"Beaulieu Toit Père Fils",id:"0x12cdc55d8c515543:0x704617ef5e5c6069",url:"https://www.google.com/maps/place/Beaulieu+toit+père+fils+couvreur/@43.7141343,7.3405202,15z"},
-    {n:"CE Toiture Cagnes sur Mer",id:"0x12cdd32e1d37b5df:0x71126950220aa1d8",url:"https://www.google.com/maps/place/CE+toiture+cagnes+sur+mer/@43.6766724,7.1499453,15z"},
-    {n:"Génie Toit ProCouvreur Villefranche",id:"0x12cddbaccd9c0321:0x494d9dc76423eea0",url:"https://www.google.com/maps/place/Génie+toit+procouvreur+villefranche+sur+mer/@43.7071354,7.3133553,15z"},
+    {n:"Beaulieu Toit Père Fils",id:"0x12cdc55d8c515543:0x704617ef5e5c6069",lat:43.714,lng:7.341,kw:"couvreur Beaulieu-sur-Mer",url:"https://www.google.com/maps/place/Beaulieu+toit+père+fils+couvreur/@43.7141343,7.3405202,15z"},
+    {n:"CE Toiture Cagnes sur Mer",id:"0x12cdd32e1d37b5df:0x71126950220aa1d8",lat:43.677,lng:7.150,kw:"couvreur Cagnes-sur-Mer",url:"https://www.google.com/maps/place/CE+toiture+cagnes+sur+mer/@43.6766724,7.1499453,15z"},
+    {n:"Génie Toit ProCouvreur Villefranche",id:"0x12cddbaccd9c0321:0x494d9dc76423eea0",lat:43.707,lng:7.313,kw:"couvreur Villefranche-sur-Mer",url:"https://www.google.com/maps/place/Génie+toit+procouvreur+villefranche+sur+mer/@43.7071354,7.3133553,15z"},
   ]},
   {name:"Jérémy",zone:"Côte d'Azur",fiches:[
-    {n:"L&B Toit Cannes",id:"0x12ce836083062ec1:0xba1c7e208100c3eb",url:"https://www.google.com/maps/place/L%26B+toit+Cannes+couvreur+pro/@43.5547342,6.9698812,15z"},
-    {n:"Toit L&B Roquefort les Pins",id:"0x12cc2d3839d287d9:0x55f591af1b241dcb",url:"https://www.google.com/maps/place/Toit+L%26B+roquefort+les+pins+couvreur+off/@43.6704419,7.0449906,15z"},
-    {n:"Mougins Brad Toiture",id:"0x12cc296e60295cb1:0x5cffe414d0e42087",url:"https://www.google.com/maps/place/Mougins+Brad+toiture+couvreur/@43.6100705,6.9926081,15z"},
-    {n:"Pro Roquefort les Pins",id:"0x12cc2dbc1373bf21:0x6cbf009b88ebbcb",url:"https://www.google.com/maps/place/Pro+roquefort+les+pins+couvreur/@43.6835716,7.0356189,15z"},
-    {n:"La Colle sur Loup Toit Sacha",id:"0x12cdd333c9ce3537:0x4fbbbb172a0e7282",url:"https://www.google.com/maps/place/La+colle+sur+loup+toit+Sacha+couvreur/@43.6930545,7.1122132,15z"},
-    {n:"Solid Antibes Couverture",id:"0x12cdd503a2719347:0xc2025fe55a4ef065",url:"https://www.google.com/maps/place/Solid+Antibes+couverture/@43.5854545,7.0949712,15z"},
-    {n:"Renov Toiture Tourrette sur Loup",id:"0x12cc2dc06c24041b:0x69c52e9c2de25849",url:"https://www.google.com/maps/place/Renov+toiture+couvreur+tourrette+sur+loup/@43.7173146,7.0677276,15z"},
-    {n:"Original Villefranche Toiture",id:"0x12cdc542cfb79bc1:0x8f2a6deffb2dc1a6",url:"https://www.google.com/maps/place/Original+ville+franche+toiture+officiel/@43.7160568,7.324256,15z"},
-    {n:"LB Toit Vence Couvreur",id:"0x12cdcd4f9968c7f3:0xadd87181569b2a9c",url:"https://www.google.com/maps/place/LB+toit+vence+couvreur/@43.7260967,7.1022461,15z"},
-    {n:"Pro Elag Elite",id:"0x12cdd3bb03632ea1:0x89330e0bb5544a28",url:"https://www.google.com/maps/place/Pro+elag+élite/@43.6867117,7.1237071,15z"},
+    {n:"L&B Toit Cannes",id:"0x12ce836083062ec1:0xba1c7e208100c3eb",lat:43.555,lng:6.970,kw:"couvreur Cannes",url:"https://www.google.com/maps/place/L%26B+toit+Cannes+couvreur+pro/@43.5547342,6.9698812,15z"},
+    {n:"Toit L&B Roquefort les Pins",id:"0x12cc2d3839d287d9:0x55f591af1b241dcb",lat:43.670,lng:7.045,kw:"couvreur Roquefort-les-Pins",url:"https://www.google.com/maps/place/Toit+L%26B+roquefort+les+pins+couvreur+off/@43.6704419,7.0449906,15z"},
+    {n:"Mougins Brad Toiture",id:"0x12cc296e60295cb1:0x5cffe414d0e42087",lat:43.610,lng:6.993,kw:"couvreur Mougins",url:"https://www.google.com/maps/place/Mougins+Brad+toiture+couvreur/@43.6100705,6.9926081,15z"},
+    {n:"Pro Roquefort les Pins",id:"0x12cc2dbc1373bf21:0x6cbf009b88ebbcb",lat:43.684,lng:7.036,kw:"couvreur Roquefort-les-Pins",url:"https://www.google.com/maps/place/Pro+roquefort+les+pins+couvreur/@43.6835716,7.0356189,15z"},
+    {n:"La Colle sur Loup Toit Sacha",id:"0x12cdd333c9ce3537:0x4fbbbb172a0e7282",lat:43.693,lng:7.112,kw:"couvreur La Colle-sur-Loup",url:"https://www.google.com/maps/place/La+colle+sur+loup+toit+Sacha+couvreur/@43.6930545,7.1122132,15z"},
+    {n:"Solid Antibes Couverture",id:"0x12cdd503a2719347:0xc2025fe55a4ef065",lat:43.585,lng:7.095,kw:"couvreur Antibes",url:"https://www.google.com/maps/place/Solid+Antibes+couverture/@43.5854545,7.0949712,15z"},
+    {n:"Renov Toiture Tourrette sur Loup",id:"0x12cc2dc06c24041b:0x69c52e9c2de25849",lat:43.717,lng:7.068,kw:"couvreur Tourrettes-sur-Loup",url:"https://www.google.com/maps/place/Renov+toiture+couvreur+tourrette+sur+loup/@43.7173146,7.0677276,15z"},
+    {n:"Original Villefranche Toiture",id:"0x12cdc542cfb79bc1:0x8f2a6deffb2dc1a6",lat:43.716,lng:7.324,kw:"couvreur Villefranche-sur-Mer",url:"https://www.google.com/maps/place/Original+ville+franche+toiture+officiel/@43.7160568,7.324256,15z"},
+    {n:"LB Toit Vence Couvreur",id:"0x12cdcd4f9968c7f3:0xadd87181569b2a9c",lat:43.726,lng:7.102,kw:"couvreur Vence",url:"https://www.google.com/maps/place/LB+toit+vence+couvreur/@43.7260967,7.1022461,15z"},
+    {n:"Pro Elag Elite",id:"0x12cdd3bb03632ea1:0x89330e0bb5544a28",lat:43.687,lng:7.124,kw:"élagueur Antibes",url:"https://www.google.com/maps/place/Pro+elag+élite/@43.6867117,7.1237071,15z"},
   ]},
   {name:"Sacha",zone:"Belgique · Bruxelles",fiches:[
-    {n:"Solid Pro Dakwerken Overijse",id:"0x47c3d71e35903881:0xee86ba771a090d5c",url:"https://www.google.com/maps/place/Solid+pro+dakwerken+couvreur+overijse/@50.7452409,4.5111538,17z"},
-    {n:"Audreghem Pro Toiture",id:"0x47c3db76bec95a75:0x321fead2b8d37f92",url:"https://www.google.com/maps/place/Audreghem+pro+toiture/@50.8132701,4.4084032,17z"},
-    {n:"Woluwe Dakwerken Toiture Elite",id:"0x47c3dd00a57c652f:0xea54d65716761317",url:"https://www.google.com/maps/place/Woluwe+dakwerken+toiture+elite+procouvreur/@50.8583656,4.4414371,17z"},
-    {n:"Couvreur Rixensart",id:"0x47c3d7161daaa04d:0x416ebdf5478682ee",url:"https://www.google.com/maps/place/Couvreur+rixensart/@50.7112398,4.5277077,17z"},
-    {n:"Tervuren Couverture Toit Pro",id:"0x47c3d9bd088b64e1:0x5c65bf4d6d2adc36",url:"https://www.google.com/maps/place/Tervuren+couverture+toit+pro+Dakdekker/@50.8372851,4.5302086,17z"},
-    {n:"Couvreur Pro Elite Uccle",id:"0x47c3c572f68d1af1:0x8c64f66e527210",url:"https://www.google.com/maps/place/Couvreur+pro+élite+uccle/@50.7806235,4.3424843,17z"},
-    {n:"ProCouverture La Hulpe",id:"0x47c3d161707a33d7:0x1ba2bde043e83456",url:"https://www.google.com/maps/place/ProCouverture+la+hulpe/@50.7399369,4.4854152,17z"},
-    {n:"ProCouvreur Waterloo Toit",id:"0x47c3cfa043f0c20b:0xcad7a3811606d5b7",url:"https://www.google.com/maps/place/ProCouvreur+waterloo+toit/@50.7135726,4.3797672,17z"},
+    {n:"Solid Pro Dakwerken Overijse",id:"0x47c3d71e35903881:0xee86ba771a090d5c",lat:50.745,lng:4.511,kw:"dakdekker Overijse",url:"https://www.google.com/maps/place/Solid+pro+dakwerken+couvreur+overijse/@50.7452409,4.5111538,17z"},
+    {n:"Audreghem Pro Toiture",id:"0x47c3db76bec95a75:0x321fead2b8d37f92",lat:50.813,lng:4.408,kw:"couvreur Auderghem",url:"https://www.google.com/maps/place/Audreghem+pro+toiture/@50.8132701,4.4084032,17z"},
+    {n:"Woluwe Dakwerken Toiture Elite",id:"0x47c3dd00a57c652f:0xea54d65716761317",lat:50.858,lng:4.441,kw:"dakdekker Woluwe",url:"https://www.google.com/maps/place/Woluwe+dakwerken+toiture+elite+procouvreur/@50.8583656,4.4414371,17z"},
+    {n:"Couvreur Rixensart",id:"0x47c3d7161daaa04d:0x416ebdf5478682ee",lat:50.711,lng:4.528,kw:"couvreur Rixensart",url:"https://www.google.com/maps/place/Couvreur+rixensart/@50.7112398,4.5277077,17z"},
+    {n:"Tervuren Couverture Toit Pro",id:"0x47c3d9bd088b64e1:0x5c65bf4d6d2adc36",lat:50.837,lng:4.530,kw:"dakdekker Tervuren",url:"https://www.google.com/maps/place/Tervuren+couverture+toit+pro+Dakdekker/@50.8372851,4.5302086,17z"},
+    {n:"Couvreur Pro Elite Uccle",id:"0x47c3c572f68d1af1:0x8c64f66e527210",lat:50.781,lng:4.342,kw:"couvreur Uccle",url:"https://www.google.com/maps/place/Couvreur+pro+élite+uccle/@50.7806235,4.3424843,17z"},
+    {n:"ProCouverture La Hulpe",id:"0x47c3d161707a33d7:0x1ba2bde043e83456",lat:50.740,lng:4.485,kw:"couvreur La Hulpe",url:"https://www.google.com/maps/place/ProCouverture+la+hulpe/@50.7399369,4.4854152,17z"},
+    {n:"ProCouvreur Waterloo Toit",id:"0x47c3cfa043f0c20b:0xcad7a3811606d5b7",lat:50.714,lng:4.380,kw:"couvreur Waterloo",url:"https://www.google.com/maps/place/ProCouvreur+waterloo+toit/@50.7135726,4.3797672,17z"},
   ]},
   {name:"CF Annecy",zone:"Annecy",fiches:[
-    {n:"CDF Couverture",id:"0xfb10b0d7961e015:0x126ccc22ae27fc5a",url:"https://www.google.com/maps/place/CDF+Couverture/@45.901203,6.1200259,14z"},
+    {n:"CDF Couverture",id:"0xfb10b0d7961e015:0x126ccc22ae27fc5a",lat:45.901,lng:6.120,kw:"couvreur Annecy",url:"https://www.google.com/maps/place/CDF+Couverture/@45.901203,6.1200259,14z"},
   ]},
   {name:"DP Renov",zone:"Saône-et-Loire",fiches:[
-    {n:"DP Rénove Toiture",id:"0x47f3a3411eb052ed:0x4d29eeaf854655a5",url:"https://www.google.com/maps/place/DP+Rénove+toiture/@46.432852,4.53521,14z"},
+    {n:"DP Rénove Toiture",id:"0x47f3a3411eb052ed:0x4d29eeaf854655a5",lat:46.433,lng:4.535,kw:"couvreur Mâcon",url:"https://www.google.com/maps/place/DP+Rénove+toiture/@46.432852,4.53521,14z"},
   ]},
   {name:"Kenny",zone:"Côte-d'Or",fiches:[
-    {n:"Expert Toiture",id:"0xac8b35f66530bedf:0x60bfdd51bd8ed612",url:"https://www.google.com/maps/place/Expert+Toiture/@47.0936808,4.5706765,14z"},
+    {n:"Expert Toiture",id:"0xac8b35f66530bedf:0x60bfdd51bd8ed612",lat:47.094,lng:4.571,kw:"couvreur Beaune",url:"https://www.google.com/maps/place/Expert+Toiture/@47.0936808,4.5706765,14z"},
   ]},
   {name:"Brulé",zone:"Clermont-Ferrand · St-Étienne",fiches:[
-    {n:"Best Couverture AB Clermont",id:"0x47f719b16f9f1ebb:0x531d498e2e4bae0b",url:"https://www.google.com/maps/place/BEST+couverture+AB+Clermont+Ferrand/@45.7945091,3.0769086,15z"},
-    {n:"Brule Renovation Couvreur",id:"0x47f5ad743ede816f:0x5c61438ae3d9a610",url:"https://www.google.com/maps/place/brule+renovation+couvreur/@45.4459937,4.3383669,15z"},
-    {n:"AB Couverture",id:"0x8b8543f879311e7:0x39910a9797c3e37d",url:"https://www.google.com/maps/place/AB+Couverture/@45.589287,3.157669,17z"},
+    {n:"Best Couverture AB Clermont",id:"0x47f719b16f9f1ebb:0x531d498e2e4bae0b",lat:45.794,lng:3.077,kw:"couvreur Clermont-Ferrand",url:"https://www.google.com/maps/place/BEST+couverture+AB+Clermont+Ferrand/@45.7945091,3.0769086,15z"},
+    {n:"Brule Renovation Couvreur",id:"0x47f5ad743ede816f:0x5c61438ae3d9a610",lat:45.446,lng:4.338,kw:"couvreur Saint-Étienne",url:"https://www.google.com/maps/place/brule+renovation+couvreur/@45.4459937,4.3383669,15z"},
+    {n:"AB Couverture",id:"0x8b8543f879311e7:0x39910a9797c3e37d",lat:45.589,lng:3.158,kw:"couvreur Clermont-Ferrand",url:"https://www.google.com/maps/place/AB+Couverture/@45.589287,3.157669,17z"},
   ]},
   {name:"Brad",zone:"Saint-Étienne",fiches:[
-    {n:"BR Toiture Rénovation",id:"0x47f5af2e1b26ce03:0xde0a286172c40cec",url:"https://www.google.com/maps/place/BR+Toiture+rénovation+couvreur+saint+Étienne/@45.4391728,4.3441927,15z"},
-    {n:"Répare Rénove Toiture",id:"0x47f5afe084be146b:0xe404b6b45053c099",url:"https://www.google.com/maps/place/Répare+Rénove+Toiture/@44.9234167,4.9163851,12z"},
-    {n:"St Etienne Expert Elite",id:"0x47f5af0a30f3e319:0xe9c6f78c49f96c0a",url:"https://www.google.com/maps/place/St+Etienne+expert+élite+couvreur/@45.4132618,4.3901763,15z"},
+    {n:"BR Toiture Rénovation",id:"0x47f5af2e1b26ce03:0xde0a286172c40cec",lat:45.439,lng:4.344,kw:"couvreur Saint-Étienne",url:"https://www.google.com/maps/place/BR+Toiture+rénovation+couvreur+saint+Étienne/@45.4391728,4.3441927,15z"},
+    {n:"Répare Rénove Toiture",id:"0x47f5afe084be146b:0xe404b6b45053c099",lat:44.923,lng:4.916,kw:"couvreur Montélimar",url:"https://www.google.com/maps/place/Répare+Rénove+Toiture/@44.9234167,4.9163851,12z"},
+    {n:"St Etienne Expert Elite",id:"0x47f5af0a30f3e319:0xe9c6f78c49f96c0a",lat:45.413,lng:4.390,kw:"couvreur Saint-Étienne",url:"https://www.google.com/maps/place/St+Etienne+expert+élite+couvreur/@45.4132618,4.3901763,15z"},
   ]},
   {name:"Ludo",zone:"Saint-Étienne",fiches:[
-    {n:"Renov Habitat Couvreur",id:"0x47f5afcbebe7f26f:0x654dfedebf40278b",url:"https://www.google.com/maps/place/Renov+Habitat+couvreur/@45.4898291,4.3656338,17z"},
+    {n:"Renov Habitat Couvreur",id:"0x47f5afcbebe7f26f:0x654dfedebf40278b",lat:45.490,lng:4.366,kw:"couvreur Saint-Étienne",url:"https://www.google.com/maps/place/Renov+Habitat+couvreur/@45.4898291,4.3656338,17z"},
   ]},
   {name:"Nathan",zone:"Privas · Ardèche",fiches:[
-    {n:"NJ Toiture",id:"0x68a91c31db8cedeb:0x2b847cbeae82a169",url:"https://www.google.com/maps/place/NJ+TOITURE/@45.434015,4.3479218,17z"},
+    {n:"NJ Toiture",id:"0x68a91c31db8cedeb:0x2b847cbeae82a169",lat:44.735,lng:4.601,kw:"couvreur Privas",url:"https://www.google.com/maps/place/NJ+TOITURE/@45.434015,4.3479218,17z"},
   ]},
 ];
 
 let apiKey=localStorage.getItem('rc_key')||'';
+const SERPAPI_KEY='fa26533e29c9cbe61b3bc4a4f6436432615952904ae309e322b8b3bf31d3ea4e';
 let results={};
 let snapshots={};
 let charts={};
@@ -452,6 +459,7 @@ async function loadAll(){
         const data=await fetchFiche(f.id);
         results[f.id]={...data,mapUrl:f.url,name:f.n};
         renderCard(cardId,data,f.url,f.n);
+        fetchRank(cardId, f, CLIENTS.find(c=>c.name===f.client)||{zone:''});
       }catch(e){
         renderCardErr(cardId,f.n,e.message,f.url);
       }
@@ -497,6 +505,7 @@ function renderCard(id,d,url,fallback){
         Voir sur Maps
       </a>
       ${renderProgress(d.reviews||0)}
+      <div class="rank-badge rank-loading" id="rank-${id}">📍 Rang en cours...</div>
     </div>
   `;
 }
@@ -878,6 +887,61 @@ function renderRanking(keys) {
       <td>${deltaHtml}</td>
     </tr>`;
   }).join('');
+}
+
+
+// ===== RANK GOOGLE =====
+async function fetchRank(cardId, fiche, client) {
+  const el = document.getElementById('rank-' + cardId);
+  if (!el) return;
+  
+  try {
+    const lat = fiche.lat || null;
+    const lng = fiche.lng || null;
+    const kw = fiche.kw || ('couvreur ' + client.zone.split('·')[0].trim());
+    
+    let found = false;
+    let position = 0;
+    
+    // Search up to 3 pages (60 results) to find exact position
+    for (let start = 0; start <= 40; start += 20) {
+      let apiUrl = `https://serpapi.com/search.json?engine=google_maps&q=${encodeURIComponent(kw)}&type=search&start=${start}&api_key=${SERPAPI_KEY}`;
+      if (lat && lng) apiUrl += `&ll=@${lat},${lng},14z`;
+      
+      const resp = await fetch('https://corsproxy.io/?' + encodeURIComponent(apiUrl));
+      if (!resp.ok) break;
+      const data = await resp.json();
+      const results = data.local_results || [];
+      if (!results.length) break;
+      
+      const idx = results.findIndex(r => {
+        if (!r.title) return false;
+        const t = r.title.toLowerCase();
+        const n = fiche.n.toLowerCase();
+        // Match on first significant word
+        const words = n.split(' ').filter(w => w.length > 3);
+        return words.some(w => t.includes(w));
+      });
+      
+      if (idx >= 0) {
+        position = start + idx + 1;
+        found = true;
+        break;
+      }
+    }
+    
+    if (found) {
+      let icon = position <= 3 ? '🥇' : position <= 10 ? '🥈' : '📍';
+      el.className = 'rank-badge' + (position <= 3 ? ' rank-top3' : '');
+      el.textContent = icon + ' #' + position + ' · ' + kw;
+    } else {
+      el.className = 'rank-badge rank-err';
+      el.textContent = '📍 Hors top 60';
+    }
+  } catch(e) {
+    el.className = 'rank-badge rank-err';
+    el.textContent = '📍 Indisponible';
+  }
 }
 
 // ===== ALERTS =====
