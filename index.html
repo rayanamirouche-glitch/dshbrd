@@ -449,7 +449,7 @@ async function loadAll(){
   const fill=document.getElementById('progress-fill');
   bar.classList.add('active');
   fill.style.width='0%';
-  const all=CLIENTS.flatMap(c=>c.fiches.map((f,fi)=>({...f,client:c.name,fi})));
+  const all=CLIENTS.flatMap(c=>c.fiches.map((f,fi)=>({...f,client:c.name,zone:c.zone,fi})));
   let done=0,qi=0;
   async function worker(){
     while(qi<all.length){
