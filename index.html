@@ -668,7 +668,8 @@ function renderDeltaBadge(placeId, cardId) {
   function btns(activeDays) {
     return periods.map(function(p) {
       var active = p === activeDays ? ' active' : '';
-      return '<button class="delta-period-btn' + active + '" onclick="updateDelta('' + placeId + '','' + cardId + '',' + p + ')">' + (p === 30 ? '30j' : p === 7 ? '7j' : p + 'j') + '</button>';
+      var label = p === 30 ? '30j' : p === 7 ? '7j' : p + 'j';
+      return '<button class="delta-period-btn' + active + '" onclick="updateDelta(\'' + placeId + '\',\'' + cardId + '\',' + p + ')">' + label + '</button>';
     }).join('');
   }
   
