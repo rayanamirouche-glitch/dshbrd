@@ -190,6 +190,16 @@ main{padding:20px 28px 48px}
 .rank-badge.rank-loading{background:var(--surface);border-color:var(--border);color:var(--muted)}
 .rank-badge.rank-err{background:#fef2f2;border-color:#fecaca;color:#dc2626}
 
+/* DELTA BADGE PAR FICHE */
+.delta-wrap{margin-top:8px;display:flex;align-items:center;gap:6px;flex-wrap:wrap}
+.delta-badge{display:inline-flex;align-items:center;gap:3px;font-size:10px;font-family:'DM Mono',monospace;font-weight:600;padding:3px 8px;border-radius:5px}
+.delta-badge.up{background:#f0fdf4;border:1px solid #bbf7d0;color:#15803d}
+.delta-badge.zero{background:var(--surface);border:1px solid var(--border);color:var(--muted)}
+.delta-badge.down{background:#fef2f2;border:1px solid #fecaca;color:#dc2626}
+.delta-period-selector{display:flex;gap:3px;margin-top:6px}
+.delta-period-btn{font-size:9px;font-family:'DM Mono',monospace;padding:2px 6px;border-radius:4px;border:1px solid var(--border);background:none;color:var(--muted);cursor:pointer;transition:all .1s}
+.delta-period-btn.active{background:var(--text);color:#fff;border-color:var(--text)}
+
 </style>
 </head>
 <body>
@@ -475,6 +485,7 @@ async function loadAll(){
   setTimeout(()=>{bar.classList.remove('active');fill.style.width='0%';},600);
   updateStats();
   saveSnapshot();
+  saveFicheSnapshots();
 }
 
 async function fetchFiche(place_id){
@@ -509,9 +520,14 @@ function renderCard(id,d,url,fallback){
         Voir sur Maps
       </a>
       ${renderProgress(d.reviews||0, id)}
+      <div id="deltabadge-${id}"></div>
       <div class="rank-badge rank-loading" id="rank-${id}">📍 Rang en cours...</div>
     </div>
   `;
+  // Injecter le delta badge avec le vrai place_id
+  var placeIdForCard = Object.keys(results).find(function(pid){ return results[pid] && results[pid].name === (d.name||fallback); }) || '';
+  var db = document.getElementById('deltabadge-'+id);
+  if(db) db.innerHTML = renderDeltaBadge(placeIdForCard, id);
 }
 
 function renderCardErr(id,name,msg,url){
@@ -588,6 +604,97 @@ function saveGoal(cid, reviews) {
     tmp.innerHTML = renderProgress(reviews, cid);
     wrap.parentNode.replaceChild(tmp.firstChild, wrap);
   }
+}
+
+// ===== DELTA PAR FICHE =====
+var ficheSnapshots = {};
+try { ficheSnapshots = JSON.parse(localStorage.getItem('rc_fiche_snaps') || '{}'); } catch(e){}
+
+function saveFicheSnapshots() {
+  // Sauvegarde nb avis actuel par place_id avec timestamp
+  var now = new Date().toISOString().split('T')[0];
+  CLIENTS.forEach(function(c) {
+    c.fiches.forEach(function(f) {
+      var r = results[f.id];
+      if (!r || !r.reviews) return;
+      if (!ficheSnapshots[f.id]) ficheSnapshots[f.id] = {};
+      ficheSnapshots[f.id][now] = r.reviews;
+    });
+  });
+  // Garder seulement les 30 derniers jours
+  Object.keys(ficheSnapshots).forEach(function(pid) {
+    var dates = Object.keys(ficheSnapshots[pid]).sort();
+    if (dates.length > 30) {
+      dates.slice(0, dates.length - 30).forEach(function(d) {
+        delete ficheSnapshots[pid][d];
+      });
+    }
+  });
+  localStorage.setItem('rc_fiche_snaps', JSON.stringify(ficheSnapshots));
+}
+
+function getDelta(placeId, days) {
+  var snaps = ficheSnapshots[placeId];
+  if (!snaps) return null;
+  var dates = Object.keys(snaps).sort();
+  if (dates.length < 2) return null;
+  var today = new Date();
+  var target = new Date(today);
+  target.setDate(target.getDate() - days);
+  var targetStr = target.toISOString().split('T')[0];
+  // Trouver la date la plus proche du target
+  var past = null;
+  for (var i = dates.length - 1; i >= 0; i--) {
+    if (dates[i] <= targetStr) { past = dates[i]; break; }
+  }
+  if (!past) past = dates[0];
+  var latest = dates[dates.length - 1];
+  if (past === latest) return null;
+  return snaps[latest] - snaps[past];
+}
+
+function renderDeltaBadge(placeId, cardId) {
+  var periods = [1, 2, 7, 30];
+  var defaultPeriod = 1;
+  
+  function badge(days) {
+    var d = getDelta(placeId, days);
+    if (d === null) return '<span class="delta-badge zero">— avis</span>';
+    var cls = d > 0 ? 'up' : d < 0 ? 'down' : 'zero';
+    var sign = d > 0 ? '+' : '';
+    return '<span class="delta-badge ' + cls + '">' + sign + d + ' avis</span>';
+  }
+  
+  function btns(activeDays) {
+    return periods.map(function(p) {
+      var active = p === activeDays ? ' active' : '';
+      return '<button class="delta-period-btn' + active + '" onclick="updateDelta('' + placeId + '','' + cardId + '',' + p + ')">' + (p === 30 ? '30j' : p === 7 ? '7j' : p + 'j') + '</button>';
+    }).join('');
+  }
+  
+  return '<div class="delta-wrap">' + badge(defaultPeriod) + '</div>' +
+    '<div class="delta-period-selector">' + btns(defaultPeriod) + '</div>';
+}
+
+function updateDelta(placeId, cardId, days) {
+  // Mettre à jour le badge et les boutons
+  var card = document.getElementById(cardId);
+  if (!card) return;
+  var dw = card.querySelector('.delta-wrap');
+  var ds = card.querySelector('.delta-period-selector');
+  if (!dw || !ds) return;
+  
+  // Update badge
+  var d = getDelta(placeId, days);
+  var cls = d === null ? 'zero' : d > 0 ? 'up' : d < 0 ? 'down' : 'zero';
+  var sign = d !== null && d > 0 ? '+' : '';
+  var txt = d === null ? '— avis' : sign + d + ' avis';
+  dw.innerHTML = '<span class="delta-badge ' + cls + '">' + txt + '</span> <span style="font-size:9px;color:var(--muted);font-family:DM Mono,monospace">/' + days + 'j</span>';
+  
+  // Update boutons
+  ds.querySelectorAll('.delta-period-btn').forEach(function(btn) {
+    btn.classList.toggle('active', parseInt(btn.textContent) === days || (days===30 && btn.textContent==='30j') || (days===7 && btn.textContent==='7j'));
+  });
 }
 
 function updateStats(){
