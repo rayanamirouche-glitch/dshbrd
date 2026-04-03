@@ -370,7 +370,7 @@ const CLIENTS=[
   ]},
   {name:"Michel",zone:"Vendée · Pays de la Loire",fiches:[
     {n:"Entreprise Toutain",id:"0x480467d32e21097f:0xecdf674d972e510b",lat:46.495,lng:-1.785,kw:"couvreur Vendée",url:"https://www.google.com/maps/place/Entreprise+Toutain/@46.4953695,-1.7897309,17z"},
-    {n:"Toutain Michel",id:"0x4805952685daf9ef:0x4dec34e8c197f93f",lat:46.903,lng:-1.203,kw:"couvreur Vendée",url:"https://www.google.com/maps/place/Toutain+Michel/@46.6994702,-1.6584938,11z"},
+    {n:"Toutain Michel",id:"0x4805952685daf9ef:0x4dec34e8c197f93f",lat:46.903,lng:-1.203,kw:"couvreur Vendée",url:"https://www.google.com/maps/place/Toutain+Michel/@46.8952281,-2.5214474,8z/data=!3m1!4b1!4m6!3m5!1s0x4805952685daf9ef:0x4dec34e8c197f93f!8m2!3d46.9028022!4d-1.2025378!16s%2Fg%2F11btltc_98?entry=ttu&g_ep=EgoyMDI2MDMzMS4wIKXMDSoASAFQAw%3D%3D"},
   ]},
 ];
 
@@ -508,7 +508,7 @@ function renderCard(id,d,url,fallback){
         <svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M7 1h4v4M11 1L6.5 5.5M5 2H2a1 1 0 00-1 1v7a1 1 0 001 1h7a1 1 0 001-1V8"/></svg>
         Voir sur Maps
       </a>
-      ${renderProgress(d.reviews||0)}
+      ${renderProgress(d.reviews||0, id)}
       <div class="rank-badge rank-loading" id="rank-${id}">📍 Rang en cours...</div>
     </div>
   `;
@@ -531,25 +531,63 @@ function renderCardErr(id,name,msg,url){
 }
 
 
-function renderProgress(reviews) {
-  var GOAL = 30;
+function getGoal(cardId) {
+  var stored = localStorage.getItem('goal_' + cardId);
+  return stored ? JSON.parse(stored) : {target: 30, days: 30};
+}
+function setGoal(cardId, target, days) {
+  localStorage.setItem('goal_' + cardId, JSON.stringify({target: parseInt(target)||30, days: parseInt(days)||30}));
+}
+function renderProgress(reviews, cardId) {
+  var goal = getGoal(cardId||'default');
+  var GOAL = goal.target;
+  var DAYS = goal.days;
   var pct = Math.min(Math.round((reviews / GOAL) * 100), 100);
   var remaining = Math.max(GOAL - reviews, 0);
-  var daysLeft = remaining > 0 ? Math.ceil(remaining / 5) : 0;
+  var perDay = DAYS > 0 ? (remaining / DAYS).toFixed(1) : '—';
   var fillClass = 'progress-bar-fill';
   if (pct >= 100) fillClass += ' done';
   else if (pct >= 70) fillClass += ' almost';
-  var dailyText = pct >= 100 ? '✓ Objectif atteint !' : '~' + daysLeft + 'j restants à 5 avis/jour';
+  var dailyText = pct >= 100 ? '✓ Objectif atteint !' : remaining + ' restants · ~' + perDay + '/j sur ' + DAYS + 'j';
+  var cid = cardId||'default';
   return '<div class="progress-wrap">' +
     '<div class="progress-header">' +
-    '<span class="progress-label">Objectif 30 avis</span>' +
-    '<span class="progress-count">' + reviews + '/30 · ' + pct + '%</span>' +
+    '<span class="progress-label">Objectif</span>' +
+    '<span class="progress-count">' + reviews + '/' + GOAL + ' · ' + pct + '%</span>' +
     '</div>' +
     '<div class="progress-bar-bg">' +
     '<div class="' + fillClass + '" style="width:' + pct + '%"></div>' +
     '</div>' +
     '<div class="progress-daily">' + dailyText + '</div>' +
+    '<div id="goal-edit-' + cid + '" style="display:none;margin-top:8px">' +
+    '<div style="display:flex;gap:6px;align-items:center;flex-wrap:wrap">' +
+    '<input type="number" id="goal-target-' + cid + '" value="' + GOAL + '" min="1" placeholder="Objectif" style="width:70px;padding:4px 7px;font-size:11px;font-family:DM Mono,monospace;border:1px solid var(--border);border-radius:6px;background:var(--surface);color:var(--text)"/>' +
+    '<span style="font-size:11px;color:var(--muted)">avis en</span>' +
+    '<input type="number" id="goal-days-' + cid + '" value="' + DAYS + '" min="1" placeholder="Jours" style="width:55px;padding:4px 7px;font-size:11px;font-family:DM Mono,monospace;border:1px solid var(--border);border-radius:6px;background:var(--surface);color:var(--text)"/>' +
+    '<span style="font-size:11px;color:var(--muted)">j</span>' +
+    '<button onclick="saveGoal(\'' + cid + '\',' + reviews + ')" style="padding:4px 10px;font-size:11px;font-weight:600;border:none;border-radius:6px;background:var(--text);color:#fff;cursor:pointer;font-family:DM Sans,sans-serif">OK</button>' +
+    '</div>' +
+    '</div>' +
+    '<button onclick="toggleGoalEdit(\'' + cid + '\')" style="margin-top:5px;background:none;border:none;font-size:10px;font-family:DM Mono,monospace;color:var(--muted);cursor:pointer;padding:0">✎ modifier objectif</button>' +
     '</div>';
+}
+function toggleGoalEdit(cid) {
+  var el = document.getElementById('goal-edit-' + cid);
+  if(el) el.style.display = el.style.display === 'none' ? 'block' : 'none';
+}
+function saveGoal(cid, reviews) {
+  var t = document.getElementById('goal-target-' + cid);
+  var d = document.getElementById('goal-days-' + cid);
+  if(!t||!d) return;
+  setGoal(cid, t.value, d.value);
+  var card = document.getElementById(cid);
+  if(!card) return;
+  var wrap = card.querySelector('.progress-wrap');
+  if(wrap) {
+    var tmp = document.createElement('div');
+    tmp.innerHTML = renderProgress(reviews, cid);
+    wrap.parentNode.replaceChild(tmp.firstChild, wrap);
+  }
 }
 
 function updateStats(){
