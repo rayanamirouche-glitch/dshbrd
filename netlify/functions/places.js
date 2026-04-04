@@ -11,14 +11,8 @@ exports.handler = async function (event, context) {
 
   const fields = "name,rating,user_ratings_total,business_status,photos,url,formatted_address";
 
-  let apiUrl;
-  if (place_id.startsWith("0x")) {
-    const parts = place_id.split(":");
-    const cid = BigInt(parts[1]).toString();
-    apiUrl = `https://maps.googleapis.com/maps/api/place/details/json?cid=${cid}&fields=${fields}&key=${API_KEY}`;
-  } else {
-    apiUrl = `https://maps.googleapis.com/maps/api/place/details/json?place_id=${place_id}&fields=${fields}&key=${API_KEY}`;
-  }
+  // Utilise toujours place_id direct — plus fiable que la conversion CID
+  const apiUrl = `https://maps.googleapis.com/maps/api/place/details/json?place_id=${encodeURIComponent(place_id)}&fields=${fields}&key=${API_KEY}`;
 
   try {
     const response = await fetch(apiUrl);
